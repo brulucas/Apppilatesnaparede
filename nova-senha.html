@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1" />
+  <meta name="theme-color" content="#FBFAFB" />
+  <meta name="robots" content="noindex, nofollow" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=28" />
+  <title>Nova senha · Pilates na Parede</title>
+</head>
+<body>
+<div class="auth-page">
+  <div class="auth-brand">
+    <div class="dot">P</div>
+    <div class="name">Pilates na Parede<span class="sub">Desafio de 21 dias</span></div>
+  </div>
+
+  <div class="auth-hero">
+    <h1>Criar nova senha</h1>
+    <p>Escolha uma senha nova pra sua conta.</p>
+  </div>
+
+  <form class="auth-form" id="newPwdForm" novalidate>
+    <div class="auth-field">
+      <label for="f-pwd">Nova senha</label>
+      <div class="auth-password">
+        <input id="f-pwd" type="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres" required minlength="6" />
+        <button type="button" class="toggle" data-toggle="#f-pwd" aria-label="Mostrar/ocultar senha"></button>
+      </div>
+    </div>
+    <div class="auth-field">
+      <label for="f-pwd2">Confirmar nova senha</label>
+      <div class="auth-password">
+        <input id="f-pwd2" type="password" autocomplete="new-password" placeholder="Digite novamente" required minlength="6" />
+        <button type="button" class="toggle" data-toggle="#f-pwd2" aria-label="Mostrar/ocultar senha"></button>
+      </div>
+    </div>
+
+    <button type="submit" class="auth-submit" id="submitBtn">Salvar nova senha</button>
+    <div class="auth-err" id="err"></div>
+  </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<script>
+const ICON_EYE     = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+const ICON_EYE_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a19.63 19.63 0 0 1 5.06-6.06M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a19.6 19.6 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+
+document.querySelectorAll('[data-toggle]').forEach(btn => {
+  btn.innerHTML = ICON_EYE;
+  btn.addEventListener('click', () => {
+    const input = document.querySelector(btn.dataset.toggle);
+    const hidden = input.type === 'password';
+    input.type = hidden ? 'text' : 'password';
+    btn.innerHTML = hidden ? ICON_EYE_OFF : ICON_EYE;
+  });
+});
+
+document.getElementById('newPwdForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const err = document.getElementById('err');
+  const btn = document.getElementById('submitBtn');
+  err.textContent = '';
+  const p1 = document.getElementById('f-pwd').value;
+  const p2 = document.getElementById('f-pwd2').value;
+  if (p1.length < 6)  { err.textContent = 'Senha muito curta (mínimo 6 caracteres).'; return; }
+  if (p1 !== p2)      { err.textContent = 'As senhas não conferem.'; return; }
+
+  btn.disabled = true; btn.textContent = 'Salvando...';
+  try {
+    await Auth.updatePassword(p1);
+    document.querySelector('.auth-page').innerHTML = `
+      <div class="auth-brand"><div class="dot">P</div><div class="name">Pilates na Parede</div></div>
+      <div class="auth-success">
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h2>Senha atualizada!</h2>
+        <p>Você já pode entrar com sua nova senha.</p>
+        <a href="/login" style="display:inline-block;margin-top:24px;padding:14px 24px;background:var(--brand);color:#fff;border-radius:999px;text-decoration:none;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;">Ir para login</a>
+      </div>
+    `;
+  } catch (ex) {
+    err.textContent = ex.message;
+    btn.disabled = false; btn.textContent = 'Salvar nova senha';
+  }
+});
+</script>
+</body>
+</html>

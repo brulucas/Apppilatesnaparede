@@ -1,0 +1,6 @@
+{
+  "name": "Pilates na Parede · 21 Dias",
+  "description": "Desafio de 21 dias de Pilates na Parede — treinos diários, progresso e histórico.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
